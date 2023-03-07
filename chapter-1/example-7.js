@@ -31,3 +31,9 @@ alice.goodMorning = function(person) {
 
 bob.getGreeting();
 alice.goodMorning(bob);
+
+try {
+    bob.goodMorning();
+} catch(e) {
+    console.log('Bob does not have the good morning function.')
+}
