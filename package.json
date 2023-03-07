@@ -1,0 +1,19 @@
+{
+  "name": "js-design-patterns",
+  "version": "1.0.0",
+  "description": "This project follows the Pro JavaScript Design Patterns book.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nickbarrett645/js-design-patterns.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nickbarrett645/js-design-patterns/issues"
+  },
+  "homepage": "https://github.com/nickbarrett645/js-design-patterns#readme"
+}
