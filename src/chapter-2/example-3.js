@@ -89,8 +89,8 @@ function addForm(formInstance) {
     console.log('Form instance added.');
 }
 
-var formInstance = new CompositeForm();
-var formInstanceError = new CompositeFormError();
+var formInstance = new CompositeForm(1, 'method', 'action');
+var formInstanceError = new CompositeFormError(1, 'method', 'action');
 
 addForm(formInstance);
 

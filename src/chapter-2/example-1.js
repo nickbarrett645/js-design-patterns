@@ -33,7 +33,7 @@ CompositeForm.prototype.save = function() {
     console.log('Saving...');
 }
 
-var formInstance = new CompositeForm(1, 'add', 'add');
+var formInstance = new CompositeForm(1, 'method', 'action');
 
 formInstance.add();
 formInstance.save();

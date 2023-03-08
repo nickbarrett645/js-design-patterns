@@ -47,8 +47,8 @@ function implements(object) {
     return true;
 }
 
-var formInstance = new CompositeForm(1, 'add', 'add');
-var formInstanceError = new CompositeFormError(1, 'add', 'add');
+var formInstance = new CompositeForm(1, 'method', 'action');
+var formInstanceError = new CompositeFormError(1, 'method', 'action');
 
 addForm(formInstance);
 
