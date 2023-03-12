@@ -16,8 +16,6 @@ Book.prototype = {
             return false;
         }
         isbn = isbn.replace(/-/g, '');
-        console.log(isbn.length)
-        console.log(isbn)
         if(isbn.length !== 10 && isbn.length !== 13) {
             return false;
         }
@@ -29,7 +27,7 @@ Book.prototype = {
             }
 
             for(var i = 0; i < 9; i++) {
-                sum += isbn.charAt(i) * (10-i);
+                sum += isbn.charAt(i) * (i+1);
             }
             var checksum = sum % 11;
             if(checksum === 10) {
@@ -46,9 +44,11 @@ Book.prototype = {
                 sum += isbn.charAt(i) * ((i % 2 === 0) ? 1 : 3)
             }
             var checksum = sum % 10;
-            console.log(checksum);
-            if(isbn.charAt(12) !== checksum) {
-                console.log('bad')
+            if(checksum !== 0) {
+                checksum = 10 - checksum;
+            }
+
+            if(parseInt(isbn.charAt(12),10) !== checksum) {
                 return false;
             }
         }
@@ -59,7 +59,6 @@ Book.prototype = {
         console.log('ISBN: ' + this.isbn + ' ' + this.title + ' by ' + this.author);
     }
 }
-
-var newBook = new Book('978-3423-214-124', 'The Hobbit', 'J.R.R. Tolkien');
+var newBook = new Book('978026110221-7', 'The Hobbit', 'J.R.R. Tolkien');
 
 newBook.display();
