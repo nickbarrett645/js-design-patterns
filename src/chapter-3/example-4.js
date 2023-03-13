@@ -7,6 +7,7 @@ var Publication = new Interface('Publication', ['getISBN', 'setISBN', 'getTitle'
 
 
 var Book = function(isbn, title, author) { // implemenets Publication
+    Interface.ensureImplements(this, Publication);
     this.setISBN(isbn);
     this.setTitle(title);
     this.setAuthor(author);
