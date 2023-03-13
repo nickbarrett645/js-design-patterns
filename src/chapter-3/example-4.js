@@ -1,5 +1,5 @@
 /* Book Class*/
-// Still wide open but using an interface to enforce the function definitions
+// Still wide open but building on example three by using _ to indicate private attributes
 var Interface = require('../utility').Interface;
 
 var Publication = new Interface('Publication', ['getISBN', 'setISBN', 'getTitle',
@@ -13,7 +13,7 @@ var Book = function(isbn, title, author) { // implemenets Publication
 }
 
 Book.prototype = {
-    checkISBN: function(isbn) {
+    _checkISBN: function(isbn) {
         if(isbn === undefined || typeof isbn !== 'string') {
             return false;
         }
@@ -58,28 +58,28 @@ Book.prototype = {
         return true;
     },
     getISBN: function() {
-        return this.isbn;
+        return this._isbn;
     },
     setISBN: function(isbn) {
-        if(!this.checkISBN(isbn)) {
+        if(!this._checkISBN(isbn)) {
             throw new Error('Book: Invalid ISBN');
         }
-        this.isbn = isbn;
+        this._isbn = isbn;
     },
     getTitle: function() {
-        return this.title;
+        return this._title;
     },
     setTitle: function(title) {
-        this.title = title || 'No Title Specified';
+        this._title = title || 'No Title Specified';
     },
     getAuthor: function() {
-        return this.author;
+        return this._author;
     },
     setAuthor: function(author) {
-        this.author = author || 'No Author Specified';
+        this._author = author || 'No Author Specified';
     },
     display: function() {
-        console.log('ISBN: ' + this.isbn + ' ' + this.title + ' by ' + this.author);
+        console.log('ISBN: ' + this.getISBN() + ' ' + this.getTitle() + ' by ' + this.getAuthor());
     }
 }
 
