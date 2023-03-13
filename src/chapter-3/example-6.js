@@ -1,20 +1,18 @@
 /* Book Class*/
-// Still wide open but using an interface to enforce the function definitions
+// Using closure now all private attributes are truly private
 var Interface = require('../utility').Interface;
 
 var Publication = new Interface('Publication', ['getISBN', 'setISBN', 'getTitle',
                                 'setTitle', 'getAuthor', 'setAuthor', 'display']);
 
 
-var Book = function(isbn, title, author) { // implemenets Publication
-    Interface.ensureImplements(this, Publication);
-    this.setISBN(isbn);
-    this.setTitle(title);
-    this.setAuthor(author);
-}
+var Book = function(newISBN, newTitle, newAuthor) { // implemenets Publication
+    
+    // Private Attributes
+    var isbn, title, author;
 
-Book.prototype = {
-    checkISBN: function(isbn) {
+    // Private method
+    function checkISBN(isbn) {
         if(isbn === undefined || typeof isbn !== 'string') {
             return false;
         }
@@ -57,30 +55,47 @@ Book.prototype = {
         }
 
         return true;
-    },
-    getISBN: function() {
-        return this.isbn;
-    },
-    setISBN: function(isbn) {
-        if(!this.checkISBN(isbn)) {
+    }
+
+    // Priviledged methods
+    this.getISBN = function() {
+        return isbn;
+    };
+
+    this.setISBN = function(newISBN) {
+        if(!checkISBN(newISBN)) {
             throw new Error('Book: Invalid ISBN');
         }
-        this.isbn = isbn;
-    },
-    getTitle: function() {
-        return this.title;
-    },
-    setTitle: function(title) {
-        this.title = title || 'No Title Specified';
-    },
-    getAuthor: function() {
-        return this.author;
-    },
-    setAuthor: function(author) {
-        this.author = author || 'No Author Specified';
-    },
+        isbn = newISBN;
+    };
+
+    this.getTitle = function() {
+        return title;
+    };
+
+    this.setTitle = function(newTitle) {
+        title = newTitle || 'No Title Specified';
+    };
+
+    this.getAuthor = function() {
+        return author;
+    };
+
+    this.setAuthor = function(newAuthor) {
+        author = newAuthor || 'No Author Specified';
+    };
+
+    Interface.ensureImplements(this, Publication);
+
+    this.setISBN(newISBN);
+    this.setTitle(newTitle);
+    this.setAuthor(newAuthor);
+    
+}
+
+Book.prototype = {
     display: function() {
-        console.log('ISBN: ' + this.isbn + ' ' + this.title + ' by ' + this.author);
+        console.log('ISBN: ' + this.getISBN() + ' ' + this.getTitle() + ' by ' + this.getAuthor());
     }
 }
 
@@ -102,3 +117,13 @@ try {
 } catch(error) {
     console.log(error.message);
 }
+
+// Trying to access private method
+try {
+    newBook13.checkISBN();
+} catch(error) {
+    console.log(error.message);
+}
+
+// Trying to access private attribute
+console.log(newBook13.title);
