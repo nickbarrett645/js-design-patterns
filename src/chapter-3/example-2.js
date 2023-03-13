@@ -27,13 +27,13 @@ Book.prototype = {
             }
 
             for(var i = 0; i < 9; i++) {
-                sum += isbn.charAt(i) * (i+1);
+                sum += isbn.charAt(i) * (10 - i);
             }
-            var checksum = sum % 11;
+            var checksum = 11 - sum % 11;
             if(checksum === 10) {
                 checksum = 'X';
             }
-            if(isbn.charAt(9) !== checksum) {
+            if(parseInt(isbn.charAt(9),10) !== checksum) {
                 return false;
             }
         } else {
@@ -59,6 +59,22 @@ Book.prototype = {
         console.log('ISBN: ' + this.isbn + ' ' + this.title + ' by ' + this.author);
     }
 }
-var newBook = new Book('978026110221-7', 'The Hobbit', 'J.R.R. Tolkien');
 
-newBook.display();
+// ISBN-10
+var newBook10 = new Book('0618260307', 'The Hobbit', 'J.R.R Tolkien');
+newBook10.display();
+try {
+    var error10 = new Book('0618260308', 'The Hobbit', 'J.R.R Tolkien');
+} catch(error) {
+    console.log(error.message);
+}
+
+// ISBN-13
+var newBook13 = new Book('978026110221-7', 'The Hobbit', 'J.R.R. Tolkien');
+newBook13.display();
+
+try {
+    var error13 = new Book('978026110221-8', 'The Hobbit', 'J.R.R Tolkien');
+} catch(error) {
+    console.log(error.message);
+}
