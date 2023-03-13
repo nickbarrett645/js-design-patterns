@@ -148,3 +148,14 @@ try {
 
 // Trying to access private attribute
 console.log(newBook13.title);
+var bookList = [];
+
+for(var i = 0; i < 50; i++) {
+    try {
+        bookList.push(new Book('978026110221-7'));
+    } catch(error) {
+        console.log(error.message);
+    }
+}
+
+console.log('Book List length: ' + bookList.length)
