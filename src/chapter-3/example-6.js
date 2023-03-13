@@ -85,6 +85,7 @@ var Book = function(newISBN, newTitle, newAuthor) { // implemenets Publication
         author = newAuthor || 'No Author Specified';
     };
 
+    // When using this structure the interface check needs to be moved down after the methods are defined
     Interface.ensureImplements(this, Publication);
 
     this.setISBN(newISBN);
