@@ -39,6 +39,26 @@ Interface.ensureImplements = function(object) {
     }
 }
 
+var extend = function(subClass, superClass) {
+    var F = function() {};
+    F.prototype = superClass.prototype;
+    subClass.prototype = new F();
+    subClass.prototype.constructor = subClass;
+
+    subClass.superClass = superClass.prototype;
+    if(superClass.prototype.constructor === Object.prototype.constructor) {
+        superClass.prototype.constructor = superClass
+    }
+}
+
+var clone = function(object) {
+    function F() {};
+    F.prototype = object;
+    return new F();
+}
+
 module.exports = {
-    Interface: Interface
+    Interface: Interface,
+    extend: extend,
+    clone: clone
 }
