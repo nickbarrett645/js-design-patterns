@@ -1,7 +1,7 @@
 // Mixin Class
-var clone = require('../utility').clone;
+var extend = require('../utility').extend;
+
 var augment = function(receivingClass, givingClass) {
-    console.log(receivingClass.prototype)
     for(methodName in givingClass.prototype) {
         if(!receivingClass.prototype[methodName]) {
             receivingClass.prototype[methodName] = givingClass.prototype[methodName];
@@ -22,20 +22,31 @@ Mixin.prototype = {
     }
 };
 
-var Person = {
-    name: 'default name',
-    getName: function() {
-        return this.name;
-    }
-};
-
-var Author = clone(Person);
-Author.books = [];
-Author.getBooks = function() {
-    return this.books;
+// Class Person
+function Person(name) {
+    this.name = name;
 }
 
-augment(Author, Mixin);
+Person.prototype.getName = function() {
+    return this.name;
+}
+
+// Class Author
+function Author(name, books) {
+    Author.superClass.constructor.call(this, name);
+    this.books = books;
+}
+
+extend(Author, Person);
+Author.prototype.getBooks = function() {
+    return this.books;
+}
+Author.prototype.getName = function() {
+    var name = Author.superClass.getName.call(this);
+    return name + ', Author of ' + this.getBooks().join(', ');
+}
+
+augment(Author,Mixin)
 
 var author = new Author('Ross Harmes', ['Pro JavaScript Design Patters']);
 console.log(author.serialize());
