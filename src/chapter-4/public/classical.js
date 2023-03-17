@@ -106,6 +106,17 @@ var DB_STORE_NAME = 'edit-texts';
 var db;
 var title;
 
+function getTitle() {
+    var value;
+    db
+    .transaction(DB_STORE_NAME)
+    .objectStore(DB_STORE_NAME)
+    .get(10).onsuccess = (event) => {
+        value = event.target.result || 'Default text';
+        title = new EditInPlaceField('titleClassical', document.getElementById('parent'), event.target.result)
+    };
+}
+
 function openDb() {
     console.log("openDb ...");
     var req = indexedDB.open(DB_NAME, DB_VERSION);
@@ -113,7 +124,7 @@ function openDb() {
         // Equal to: db = req.result;
         db = this.result;
         console.log("openDb DONE");
-        title = new EditInPlaceField('titleClassical', document.getElementById('parent'), 'Title Here')
+        getTitle();
 
     };
     req.onerror = function (evt) {
@@ -123,7 +134,7 @@ function openDb() {
     req.onupgradeneeded = function (evt) {
         console.log("openDb.onupgradeneeded");
         var store = evt.currentTarget.result.createObjectStore(
-        DB_STORE_NAME, { autoIncrement: true });
+        DB_STORE_NAME, { autoIncrement: false });
     };
 }
 
@@ -133,4 +144,3 @@ function getObjectStore(storeName, mode) {
 }
 
 openDb();
-
