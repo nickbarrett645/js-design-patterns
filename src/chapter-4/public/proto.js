@@ -1,15 +1,15 @@
 // Edit In Place using Classical Inheritance
-function EditInPlaceField(id, parent, value) {
-    this.id = id;
-    this.value = value || 'default value';
-    this.parentElement = parent;
+var EditInPlaceField = {
+    configure: function(id, parent, value) {
+        this.id = id;
+        this.value = value || 'default value';
+        this.parentElement = parent;
 
-    this.createElements(id);
-    this.attachEvents();
-    this.getText();
-}
+        this.createElements(id);
+        this.attachEvents();
+        this.getText();
+    },
 
-EditInPlaceField.prototype = {
     createElements: function(id) {
         this.containerElement = document.createElement('div');
         this.parentElement.appendChild(this.containerElement);
@@ -121,27 +121,19 @@ EditInPlaceField.prototype = {
             this.setValue(value)
         };
     }
+    
 };
 
-var extend = function(subClass, superClass) {
-    var F = function() {};
-    F.prototype = superClass.prototype;
-    subClass.prototype = new F();
-    subClass.prototype.constructor = subClass;
-
-    subClass.superClass = superClass.prototype;
-    if(superClass.prototype.constructor === Object.prototype.constructor) {
-        superClass.prototype.constructor = superClass
-    }
+var clone = function(object) {
+    function F() {};
+    F.prototype = object;
+    return new F();
 }
 
-function EditInPlaceArea(id, parent, value) {
-    EditInPlaceArea.superClass.constructor.call(this, id, parent, value);
-}
-extend(EditInPlaceArea, EditInPlaceField);
+var EditInPlaceArea = clone(EditInPlaceField);
 
 // Note dont create new object for prototype here...
-EditInPlaceArea.prototype.createElements = function(id) {
+EditInPlaceArea.createElements = function(id) {
     this.containerElement = document.createElement('div');
     this.parentElement.appendChild(this.containerElement);
 
@@ -167,7 +159,7 @@ EditInPlaceArea.prototype.createElements = function(id) {
     this.convertToText();
 };
 
-EditInPlaceArea.prototype.convertToEditable = function() {
+EditInPlaceArea.convertToEditable = function() {
     this.staticElement.style.display = 'none';
     this.fieldElement.style.display = 'block';
     this.saveButton.style.display = 'inline';
@@ -176,7 +168,7 @@ EditInPlaceArea.prototype.convertToEditable = function() {
     this.setValue(this.value);
 };
 
-EditInPlaceArea.prototype.convertToText = function() {
+EditInPlaceArea.convertToText = function() {
     this.staticElement.style.display = 'block';
     this.fieldElement.style.display = 'none';
     this.saveButton.style.display = 'none';
@@ -193,8 +185,10 @@ var title;
 
 function initializeElements() {
     var title, paragraph;
-    title = new EditInPlaceField('titleClassical', document.getElementById('parent'));
-    paragraph = new EditInPlaceArea('areaClassical', document.getElementById('parent'));
+    title = clone(EditInPlaceField);
+    title.configure('titlePrototype', document.getElementById('parent'))
+    paragraph = clone(EditInPlaceArea);
+    paragraph.configure('areaPrototype', document.getElementById('parent'))
 }
 
 function openDb() {
