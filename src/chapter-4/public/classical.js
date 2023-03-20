@@ -1,5 +1,4 @@
 // Edit In Place using Classical Inheritance
-
 function EditInPlaceField(id, parent, value) {
     this.id = id;
     this.value = value || 'default value';
@@ -95,70 +94,33 @@ EditInPlaceField.prototype = {
 
     getValue: function() {
         return this.fieldElement.value;
+    },
+
+    getText: function() {
+        var value, query = db
+            .transaction(DB_STORE_NAME)
+            .objectStore(DB_STORE_NAME)
+            .get(this.id);
+        query.onsuccess = (event) => {
+            if(event.target.result) {
+                value = event.target.result;
+            } else {
+                value = 'Default Text';
+            }
+            value = event.target.result || 'Default text';
+            this.setValue(value);
+        }
+        query.onerror = (event) => {
+            if(event.target.result) {
+                value = event.target.result;
+            } else {
+                value = 'Default text';
+            }
+            value = event.target.result || 'Default text';
+            this.setValue(value)
+        };
     }
 };
-
-var DB_NAME = 'edit-text-example';
-var DB_VERSION = 1;
-var DB_STORE_NAME = 'edit-texts';
-var db;
-var title;
-
-function getText() {
-    var value;
-    var query = db
-    .transaction(DB_STORE_NAME)
-    .objectStore(DB_STORE_NAME)
-    .get(1);
-    query.onsuccess = (event) => {
-        if(event.target.result) {
-            value = event.target.result;
-        } else {
-            value = 'Default Text';
-        }
-        value = event.target.result || 'Default text';
-        title = new EditInPlaceField('titleClassical', document.getElementById('parent'), value);
-        title = new EditInPlaceArea('areaClassical', document.getElementById('parent'), value);
-    }
-    query.onerror = (event) => {
-        if(event.target.result) {
-            value = event.target.result;
-        } else {
-            value = 'Default text';
-        }
-        value = event.target.result || 'Default text';
-        title = new EditInPlaceField('titleClassical', document.getElementById('parent'), value);
-        title = new EditInPlaceArea('areaClassical', document.getElementById('parent'), value);
-    };
-}
-
-function openDb() {
-    console.log("openDb ...");
-    var req = indexedDB.open(DB_NAME, DB_VERSION);
-    req.onsuccess = function (evt) {
-        // Equal to: db = req.result;
-        db = this.result;
-        console.log("openDb DONE");
-        getText();
-
-    };
-    req.onerror = function (evt) {
-        console.error("openDb:", evt.target.errorCode);
-    };
-
-    req.onupgradeneeded = function (evt) {
-        console.log("openDb.onupgradeneeded");
-        var store = evt.currentTarget.result.createObjectStore(
-        DB_STORE_NAME, { autoIncrement: false });
-    };
-}
-
-function getObjectStore(storeName, mode) {
-    var transaction = db.transaction(storeName, mode);
-    return transaction.objectStore(storeName);
-}
-
-openDb();
 
 var extend = function(subClass, superClass) {
     var F = function() {};
@@ -171,7 +133,6 @@ var extend = function(subClass, superClass) {
         superClass.prototype.constructor = superClass
     }
 }
-
 
 function EditInPlaceArea(id, parent, value) {
     EditInPlaceArea.superClass.constructor.call(this, id, parent, value);
@@ -223,26 +184,48 @@ EditInPlaceArea.prototype.convertToText = function() {
     this.setValue(this.value);
 };
 
-EditInPlaceArea.prototype.save = function() {
-    console.log('saving...');
-    var store = getObjectStore(DB_STORE_NAME, 'readwrite');
-    var req;
-    var that = this;
+var DB_NAME = 'edit-text-example';
+var DB_VERSION = 1;
+var DB_STORE_NAME = 'edit-texts';
+var db;
+var title;
 
-    try{
-        req = store.put(this.getValue(), this.id)
-    } catch(e) {
-        console.log(e.message);
-    }
+function initializeElements() {
+    var title, paragraph;
+    title = new EditInPlaceField('titleClassical', document.getElementById('parent'));
+    paragraph = new EditInPlaceArea('areaClassical', document.getElementById('parent'));
 
-    req.onsuccess = function(event) {
-        console.log('item successfully added');
-        that.value = that.getValue();
-        that.convertToText();
-    }
-
-    req.onerror = function(event) {
-        console.error('Error adding: ', this.error);
-    }
+    title.getText();
+    paragraph.getText();
 }
+
+function openDb() {
+    console.log("openDb ...");
+    var req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onsuccess = function (evt) {
+        // Equal to: db = req.result;
+        db = this.result;
+        console.log("openDb DONE");
+        initializeElements();
+
+    };
+    req.onerror = function (evt) {
+        console.error("openDb:", evt.target.errorCode);
+    };
+
+    req.onupgradeneeded = function (evt) {
+        console.log("openDb.onupgradeneeded");
+        var store = evt.currentTarget.result.createObjectStore(
+        DB_STORE_NAME, { autoIncrement: false });
+    };
+}
+
+function getObjectStore(storeName, mode) {
+    var transaction = db.transaction(storeName, mode);
+    return transaction.objectStore(storeName);
+}
+
+openDb();
+
+
 
