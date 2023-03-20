@@ -7,3 +7,5 @@ The examples for chapter 4 can be accessed by first running the server and then 
 
 # Run Server
 `node server.js`
+
+These example use [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) as the backend to store the text values.
