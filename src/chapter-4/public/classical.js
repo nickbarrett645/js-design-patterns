@@ -59,7 +59,7 @@ EditInPlaceField.prototype = {
         var that = this;
 
         try{
-            req = store.put(this.getValue(), 1)
+            req = store.put(this.getValue(), this.id)
         } catch(e) {
             console.log(e.message);
         }
@@ -104,7 +104,7 @@ var DB_STORE_NAME = 'edit-texts';
 var db;
 var title;
 
-function getTitle() {
+function getText() {
     var value;
     var query = db
     .transaction(DB_STORE_NAME)
@@ -117,7 +117,8 @@ function getTitle() {
             value = 'Default Text';
         }
         value = event.target.result || 'Default text';
-        title = new EditInPlaceField('titleClassical', document.getElementById('parent'), value)
+        title = new EditInPlaceField('titleClassical', document.getElementById('parent'), value);
+        title = new EditInPlaceArea('areaClassical', document.getElementById('parent'), value);
     }
     query.onerror = (event) => {
         if(event.target.result) {
@@ -126,7 +127,8 @@ function getTitle() {
             value = 'Default text';
         }
         value = event.target.result || 'Default text';
-        title = new EditInPlaceField('titleClassical', document.getElementById('parent'), event.target.result)
+        title = new EditInPlaceField('titleClassical', document.getElementById('parent'), value);
+        title = new EditInPlaceArea('areaClassical', document.getElementById('parent'), value);
     };
 }
 
@@ -137,7 +139,7 @@ function openDb() {
         // Equal to: db = req.result;
         db = this.result;
         console.log("openDb DONE");
-        getTitle();
+        getText();
 
     };
     req.onerror = function (evt) {
@@ -157,3 +159,90 @@ function getObjectStore(storeName, mode) {
 }
 
 openDb();
+
+var extend = function(subClass, superClass) {
+    var F = function() {};
+    F.prototype = superClass.prototype;
+    subClass.prototype = new F();
+    subClass.prototype.constructor = subClass;
+
+    subClass.superClass = superClass.prototype;
+    if(superClass.prototype.constructor === Object.prototype.constructor) {
+        superClass.prototype.constructor = superClass
+    }
+}
+
+
+function EditInPlaceArea(id, parent, value) {
+    EditInPlaceArea.superClass.constructor.call(this, id, parent, value);
+}
+extend(EditInPlaceArea, EditInPlaceField);
+
+// Note dont create new object for prototype here...
+EditInPlaceArea.prototype.createElements = function(id) {
+    this.containerElement = document.createElement('div');
+    this.parentElement.appendChild(this.containerElement);
+
+    this.staticElement = document.createElement('p');
+    this.containerElement.appendChild(this.staticElement);
+    this.staticElement.innerHTML = this.value;
+
+    this.fieldElement = document.createElement('textarea');
+    this.fieldElement.type = 'text';
+    this.fieldElement.value = this.value;
+    this.containerElement.appendChild(this.fieldElement);
+
+    this.saveButton = document.createElement('input');
+    this.saveButton.type = 'button';
+    this.saveButton.value = 'Save';
+    this.containerElement.appendChild(this.saveButton);
+
+    this.cancelButton = document.createElement('input');
+    this.cancelButton.type = 'button';
+    this.cancelButton.value = 'Cancel';
+    this.containerElement.appendChild(this.cancelButton);
+
+    this.convertToText();
+};
+
+EditInPlaceArea.prototype.convertToEditable = function() {
+    this.staticElement.style.display = 'none';
+    this.fieldElement.style.display = 'block';
+    this.saveButton.style.display = 'inline';
+    this.cancelButton.style.display = 'inline';
+
+    this.setValue(this.value);
+};
+
+EditInPlaceArea.prototype.convertToText = function() {
+    this.staticElement.style.display = 'block';
+    this.fieldElement.style.display = 'none';
+    this.saveButton.style.display = 'none';
+    this.cancelButton.style.display = 'none';
+
+    this.setValue(this.value);
+};
+
+EditInPlaceArea.prototype.save = function() {
+    console.log('saving...');
+    var store = getObjectStore(DB_STORE_NAME, 'readwrite');
+    var req;
+    var that = this;
+
+    try{
+        req = store.put(this.getValue(), this.id)
+    } catch(e) {
+        console.log(e.message);
+    }
+
+    req.onsuccess = function(event) {
+        console.log('item successfully added');
+        that.value = that.getValue();
+        that.convertToText();
+    }
+
+    req.onerror = function(event) {
+        console.error('Error adding: ', this.error);
+    }
+}
+
