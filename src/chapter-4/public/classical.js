@@ -59,7 +59,7 @@ EditInPlaceField.prototype = {
         var that = this;
 
         try{
-            req = store.add(this.getValue())
+            req = store.put(this.getValue(), 1)
         } catch(e) {
             console.log(e.message);
         }
@@ -89,8 +89,6 @@ EditInPlaceField.prototype = {
     },
 
     setValue: function(value) {
-        console.log(this.fieldElement);
-        console.log(this.staticElement)
         this.fieldElement.value = value;
         this.staticElement.innerHTML = value;
     },
@@ -108,10 +106,25 @@ var title;
 
 function getTitle() {
     var value;
-    db
+    var query = db
     .transaction(DB_STORE_NAME)
     .objectStore(DB_STORE_NAME)
-    .get(10).onsuccess = (event) => {
+    .get(1);
+    query.onsuccess = (event) => {
+        if(event.target.result) {
+            value = event.target.result;
+        } else {
+            value = 'Default Text';
+        }
+        value = event.target.result || 'Default text';
+        title = new EditInPlaceField('titleClassical', document.getElementById('parent'), value)
+    }
+    query.onerror = (event) => {
+        if(event.target.result) {
+            value = event.target.result;
+        } else {
+            value = 'Default text';
+        }
         value = event.target.result || 'Default text';
         title = new EditInPlaceField('titleClassical', document.getElementById('parent'), event.target.result)
     };
