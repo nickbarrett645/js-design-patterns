@@ -1,15 +1,7 @@
-// Edit In Place using Prototypal Inheritance
-var EditInPlaceField = {
-    configure: function(id, parent, value) {
-        this.id = id;
-        this.value = value || 'default value';
-        this.parentElement = parent;
+// Edit In Place using Mixin Inheritance
+var EditInPlaceMixin = function() {};
 
-        this.createElements(id);
-        this.attachEvents();
-        this.getText();
-    },
-
+EditInPlaceMixin.prototype = {
     createElements: function(id) {
         this.containerElement = document.createElement('div');
         this.parentElement.appendChild(this.containerElement);
@@ -121,19 +113,46 @@ var EditInPlaceField = {
             this.setValue(value)
         };
     }
-    
 };
 
-var clone = function(object) {
-    function F() {};
-    F.prototype = object;
-    return new F();
+function EditInPlaceField(id, parent, value) {
+    this.id = id;
+    this.value = value || 'default value';
+    this.parentElement = parent;
+
+    this.createElements(id);
+    this.attachEvents();
+    this.getText();
 }
 
-var EditInPlaceArea = clone(EditInPlaceField);
+var augment = function(receivingClass, givingClass) {
+    if(arguments[2]) {
+        for(var i = 2; i < arguments.length; i++) {
+            receivingClass.prototype[arguments[i]] = givingClass.prototype[arguments[i]];
+        }
+    } else {
+        for(methodName in givingClass.prototype) {
+            receivingClass.prototype[methodName] = givingClass.prototype[methodName]
+        }
+    }
+}
+
+augment(EditInPlaceField, EditInPlaceMixin);
+
+function EditInPlaceArea(id, parent, value) {
+    this.id = id;
+    this.value = value || 'default value';
+    this.parentElement = parent;
+
+    this.createElements(id);
+    this.attachEvents();
+    this.getText();
+}
+
+augment(EditInPlaceArea, EditInPlaceMixin);
 
 // Note dont create new object for prototype here...
-EditInPlaceArea.createElements = function(id) {
+EditInPlaceArea.prototype.createElements = function(id) {
     this.containerElement = document.createElement('div');
     this.parentElement.appendChild(this.containerElement);
 
@@ -159,7 +178,7 @@ EditInPlaceArea.createElements = function(id) {
     this.convertToText();
 };
 
-EditInPlaceArea.convertToEditable = function() {
+EditInPlaceArea.prototype.convertToEditable = function() {
     this.staticElement.style.display = 'none';
     this.fieldElement.style.display = 'block';
     this.saveButton.style.display = 'inline';
@@ -168,7 +187,7 @@ EditInPlaceArea.convertToEditable = function() {
     this.setValue(this.value);
 };
 
-EditInPlaceArea.convertToText = function() {
+EditInPlaceArea.prototype.convertToText = function() {
     this.staticElement.style.display = 'block';
     this.fieldElement.style.display = 'none';
     this.saveButton.style.display = 'none';
@@ -185,10 +204,8 @@ var title;
 
 function initializeElements() {
     var title, paragraph;
-    title = clone(EditInPlaceField);
-    title.configure('titlePrototype', document.getElementById('parent'))
-    paragraph = clone(EditInPlaceArea);
-    paragraph.configure('areaPrototype', document.getElementById('parent'))
+    title = new EditInPlaceField('titleMixin', document.getElementById('parent'));
+    paragraph = new EditInPlaceArea('areaMixin', document.getElementById('parent'));
 }
 
 function openDb() {
