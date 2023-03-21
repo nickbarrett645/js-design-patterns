@@ -1,5 +1,5 @@
 // Dealing with child object fields
-var clone = require('../../v1/utility').clone;
+var clone = require('../../utility/v1/utility').clone;
 
 var CompoundObject = {
     string1: 'default value',

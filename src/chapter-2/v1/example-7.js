@@ -1,5 +1,5 @@
 // ResultFormatter class, using the interface implementation
-var Interface = require('../../v1/utility').Interface;
+var Interface = require('../../utility/v1/utility').Interface;
 var SUCCESS = 'SUCCESS';
 var INCORRECT = 'INCORRECT';
 var CHECK_MARK = '√'

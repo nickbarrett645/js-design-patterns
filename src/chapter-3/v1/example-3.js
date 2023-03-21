@@ -1,6 +1,6 @@
 /* Book Class*/
 // Still wide open but using an interface to enforce the function definitions
-var Interface = require('../../v1/utility').Interface;
+var Interface = require('../../utility/v1/utility').Interface;
 
 var Publication = new Interface('Publication', ['getISBN', 'setISBN', 'getTitle',
                                 'setTitle', 'getAuthor', 'setAuthor', 'display']);
