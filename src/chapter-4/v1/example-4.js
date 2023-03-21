@@ -1,5 +1,5 @@
 // Prototypal Inheritance
-var clone = require('../utility').clone;
+var clone = require('../../v1/utility').clone;
 
 var Person = {
     name: 'default name',

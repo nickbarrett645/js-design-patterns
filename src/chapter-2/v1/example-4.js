@@ -1,4 +1,4 @@
-var Interface = require('../utility.js').Interface
+var Interface = require('../../v1/utility').Interface
 
 var DynamicMap = new Interface('DynamicMap', ['centerOnPoint', 'zoom', 'draw']);
 

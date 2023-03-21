@@ -1,6 +1,6 @@
 /* Book Class*/
 // Still wide open but building on example three by using _ to indicate private attributes
-var Interface = require('../utility').Interface;
+var Interface = require('../../v1/utility').Interface;
 
 var Publication = new Interface('Publication', ['getISBN', 'setISBN', 'getTitle',
                                 'setTitle', 'getAuthor', 'setAuthor', 'display']);
