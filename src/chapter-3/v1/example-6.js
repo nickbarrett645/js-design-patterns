@@ -1,6 +1,6 @@
 /* Book Class*/
 // Using closure now all private attributes are truly private
-var Interface = require('../../v1/utility').Interface;
+var Interface = require('../../utility/v1/utility').Interface;
 
 var Publication = new Interface('Publication', ['getISBN', 'setISBN', 'getTitle',
                                 'setTitle', 'getAuthor', 'setAuthor', 'display']);
