@@ -1,5 +1,5 @@
 // Mixin Class
-var extend = require('../utility').extend;
+var extend = require('../../v1/utility').extend;
 
 var augment = function(receivingClass, givingClass) {
     for(methodName in givingClass.prototype) {

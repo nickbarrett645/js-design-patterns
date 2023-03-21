@@ -1,5 +1,5 @@
 // Dealing with child object fields
-var clone = require('../utility').clone;
+var clone = require('../../v1/utility').clone;
 
 var CompoundObject = {
     string1: 'default value',
@@ -11,11 +11,7 @@ var CompoundObject = {
 
 var compoundObjectClone = clone(CompoundObject);
 var compoundObjectClone2 = clone(CompoundObject);
-// Recreating the entire object
-compoundObjectClone.childObject = {
-    bool: true,
-    num: 5
-};
-// Objects have now have different fields
+compoundObjectClone.childObject.num = 5;
+// Objects have the same field now
 console.log(compoundObjectClone.childObject.num);
 console.log(compoundObjectClone2.childObject.num);

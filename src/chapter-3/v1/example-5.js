@@ -45,5 +45,5 @@ console.log(baz()); // outputs 20
 console.log(baz()); // outputs 40
 console.log(baz()); // outputs 80
 
-var blat = foo();
+var blat = foo3();
 console.log(blat()); // outputs 20
