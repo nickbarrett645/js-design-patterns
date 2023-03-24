@@ -52,6 +52,5 @@ GiantCorp.RegPage = {
 };
 
 onload = function(event) {
-    console.log('loaded');
     GiantCorp.RegPage.init();
 }
