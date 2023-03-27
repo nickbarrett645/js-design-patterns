@@ -40,8 +40,6 @@ var BicycleFactory = {
 
         Interface.ensureImplements(bicycle, Bicycle);
 
-        
-        
         return bicycle;
     }
 }
@@ -103,11 +101,11 @@ ComfortCruiser.prototype = {
     }
 };
 
-var Flaylander = function() {
+var Flatlander = function() {
     this.name = 'The Flatlander';
 }
 
-Flaylander.prototype = {
+Flatlander.prototype = {
     assemble: function() {
         console.log('Assembling: ' + this.name);
     },
