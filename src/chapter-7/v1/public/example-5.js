@@ -38,14 +38,22 @@ Interface.ensureImplements = function(object) {
         }
     }
 }
-// AjaxHandler Interface
+var extend = function(subClass, superClass) {
+    var F = function() {};
+    F.prototype = superClass.prototype;
+    subClass.prototype = new F();
+    subClass.prototype.constructor = subClass;
 
+    subClass.superClass = superClass.prototype;
+    if(superClass.prototype.constructor === Object.prototype.constructor) {
+        superClass.prototype.constructor = superClass
+    }
+}
+// AjaxHandler Interface
 var AjaxHandler = new Interface('AjaxHandler', ['request', 'createXhrObject']);
 
 // SimpleHandler class
-var SimpleHandler = function() {
-    Interface.ensureImplements(this, AjaxHandler);
-}
+var SimpleHandler = function() {}
 SimpleHandler.prototype = {
     request: function(method, url, callback, postVars) {
         var xhr = this.createXhrObject();
@@ -91,7 +99,63 @@ SimpleHandler.prototype = {
     }
 };
 
-var myHandler = new SimpleHandler();
+//QueuedHanlder Class
+var QueuedHandler = function() {
+    Interface.ensureImplements(this, AjaxHandler);
+    this.queue = [];
+    this.requestInProgress = false;
+    this.retryDelay = 5;
+}
+
+extend(QueuedHandler, SimpleHandler);
+
+QueuedHandler.prototype.request = function(method, url, callback, postVars, override) {
+    if(this.requestInProgress && !override) {
+        this.queue.push({
+            method: method,
+            url: url,
+            callback: callback,
+            postVars: postVars
+        });
+    } else {
+        
+        this.requestInProgress = true;
+        var xhr = this.createXhrObject();
+        var that = this;
+        xhr.onreadystatechange = function() {
+            if(xhr.readyState !== 4) {
+                return
+            }
+
+            if(xhr.status === 200) {
+                callback.success(xhr.responseText, xhr.responseXML);
+                that.advanceQueue();
+            } else {
+                callback.failure(xhr.status);
+                setTimeout(function() {
+                    that.request(method, url, callback, postVars);
+                }, that.retryDelay * 1000);
+            }
+        }
+        xhr.open(method, url, true);
+        if(method !== 'POST') {
+            postVars = null;
+        }
+        xhr.send(postVars)
+    }
+}
+
+QueuedHandler.prototype.advanceQueue = function() {
+    if(this.queue.length === 0) {
+        this.requestInProgress = false;
+        return;
+    }
+
+    var req = this.queue.shift();
+    this.request(req.method, req.url, req.callback, req.postVars, true);
+}
+
+var myHandler = new QueuedHandler();
 var callback = {
     success: function(responseText) {
         alert('Success: ' + responseText)
@@ -102,6 +166,7 @@ var callback = {
 };
 
 // Success
-myHandler.request('GET', 'example-4.html', callback);
+myHandler.request('GET', 'example-5.html', callback);
+myHandler.request('GET', 'example-5.js', callback);
 // Failure
 myHandler.request('GET', 'error.html', callback);
