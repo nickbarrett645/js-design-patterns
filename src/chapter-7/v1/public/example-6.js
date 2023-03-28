@@ -38,14 +38,22 @@ Interface.ensureImplements = function(object) {
         }
     }
 }
-// AjaxHandler Interface
+var extend = function(subClass, superClass) {
+    var F = function() {};
+    F.prototype = superClass.prototype;
+    subClass.prototype = new F();
+    subClass.prototype.constructor = subClass;
 
+    subClass.superClass = superClass.prototype;
+    if(superClass.prototype.constructor === Object.prototype.constructor) {
+        superClass.prototype.constructor = superClass
+    }
+}
+// AjaxHandler Interface
 var AjaxHandler = new Interface('AjaxHandler', ['request', 'createXhrObject']);
 
 // SimpleHandler class
-var SimpleHandler = function() {
-    Interface.ensureImplements(this, AjaxHandler);
-}
+var SimpleHandler = function() {}
 SimpleHandler.prototype = {
     request: function(method, url, callback, postVars) {
         var xhr = this.createXhrObject();
@@ -91,7 +99,45 @@ SimpleHandler.prototype = {
     }
 };
 
-var myHandler = new SimpleHandler();
+//QueuedHanlder Class
+var OfflineHandler = function() {
+    Interface.ensureImplements(this, AjaxHandler);
+    this.storedRequests = [];
+}
+
+extend(OfflineHandler, SimpleHandler);
+
+OfflineHandler.prototype.request = function(method, url, callback, postVars) {
+    if(XhrManager.isOffline()) {
+        console.log('offline');
+        this.storedRequests.push({
+            method: method,
+            url: url,
+            callback: callback,
+            postVars: postVars
+        })
+    } else {
+        console.log('not offline')
+        this.flushStoredRequests();
+        OfflineHandler.superClass.request(method, url, callback, postVars);
+    }
+}
+
+OfflineHandler.prototype.flushStoredRequests = function() {
+    for(var i = 0; i < this.storedRequests.length; i++) {
+        var req = this.storedRequests[i];
+        OfflineHandler.superClass.request(req.method, req.url, req.callback, req.postVars);
+    }
+}
+
+// set isOffline to randomly decide if offline or not
+var XhrManager = {
+    isOffline: function() {
+        return !(Math.floor(Math.random() * 2) % 2);
+    }
+}
+
+var myHandler = new OfflineHandler();
 var callback = {
     success: function(responseText) {
         alert('Success: ' + responseText)
@@ -102,6 +148,7 @@ var callback = {
 };
 
 // Success
-myHandler.request('GET', 'example-4.html', callback);
+myHandler.request('GET', 'example-5.html', callback);
+myHandler.request('GET', 'example-5.js', callback);
 // Failure
 myHandler.request('GET', 'error.html', callback);
