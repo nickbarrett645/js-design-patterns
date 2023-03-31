@@ -41,7 +41,8 @@ var requestListner = (req, res) => {
     let fileName = req.url;
     if (req.url === '/') {
       fileName = 'index.html';
-    }
+      extension = 'html';
+      type = types[extension];
 
     if (!extension && queryData.proxy) {
         var request = https.get(queryData.proxy, function(response) {
@@ -63,6 +64,9 @@ var requestListner = (req, res) => {
           res.end('404: Failed to get feed');
         });
         
+    } else if(!extension && queryData.id) {
+      res.writeHead(200, {'Content-Type': types.json});
+      res.end(JSON.stringify({id: queryData.id, data: 'test data'}))
     } else {
       var filePath = path.join(root, fileName);
       var isPathUnderRoot = path
