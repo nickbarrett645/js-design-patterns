@@ -1,14 +1,16 @@
-const http = require('http');
-const path = require('path');
-const fs = require('fs');
-const fsPromise = fs.promises;
+var http = require('http');
+var https = require('https');
+var path = require('path');
+var url = require('url');
+var fs = require('fs');
+var fsPromise = fs.promises;
 
 
 
-const host = 'localhost';
-const port = 8000;
-const directoryName = '/public';
-const types = {
+var host = 'localhost';
+var port = 8000;
+var directoryName = '/public';
+var types = {
     html: 'text/html',
     css: 'text/css',
     js: 'application/javascript',
@@ -20,14 +22,15 @@ const types = {
     xml: 'application/xml',
 };
 
-const root = path.normalize(path.resolve(__dirname + directoryName));
+var root = path.normalize(path.resolve(__dirname + directoryName));
 
-const requestListner = (req, res) => {
+var requestListner = (req, res) => {
     console.log(`${req.method} ${req.url}`);
   
-    const extension = path.extname(req.url).slice(1);
-    const type = extension ? types[extension] : types.html;
-    const supportedExtension = Boolean(type);
+    var extension = path.extname(req.url).slice(1);
+    var type = extension ? types[extension] : types.xml;
+    var supportedExtension = Boolean(type);
+    var queryData = url.parse(req.url, true).query;
   
     if (!supportedExtension) {
       res.writeHead(404, { 'Content-Type': 'text/html' });
@@ -36,36 +39,56 @@ const requestListner = (req, res) => {
     }
   
     let fileName = req.url;
-    if (req.url === '/') fileName = 'index.html';
-    else if (!extension) {
-        fsPromise.access(path.join(root, req.url + '.html'), fs.constants.F_OK)
-            .then(() => fileName = req.url + '.html')
-            .catch(() => console.log('Cannot be accessed'));
+    if (req.url === '/') {
+      fileName = 'index.html';
     }
-  
-    const filePath = path.join(root, fileName);
-    const isPathUnderRoot = path
-      .normalize(path.resolve(filePath))
-      .startsWith(root);
-  
-    if (!isPathUnderRoot) {
-      res.writeHead(404, { 'Content-Type': 'text/html' });
-      res.end('404: File not found');
-      return;
-    }
-  
-    fsPromise.readFile(filePath)
-        .then(data => {
-            res.writeHead(200, { 'Content-Type': type });
+
+    if (!extension && queryData.proxy) {
+      console.log(queryData.proxy);
+        var request = https.get(queryData.proxy, function(response) {
+          let data = '';
+          response.on('data', function(chunk) {
+            data = data + chunk.toString();
+          });
+
+          response.on('end', function() {
+            res.writeHead(200, {'Content-Type': type});
             res.end(data);
-        })
-        .catch(err => {
-            res.writeHead(404, { 'Content-Type': 'text/html' });
-            res.end('404: File not found');
+          });
+
         });
+
+        request.on('error', function(error) {
+          console.log(error);
+          res.writeHead(404, { 'Content-Type': 'text/html' });
+          res.end('404: Failed to get feed');
+        });
+        
+    } else {
+      var filePath = path.join(root, fileName);
+      var isPathUnderRoot = path
+        .normalize(path.resolve(filePath))
+        .startsWith(root);
+  
+      if (!isPathUnderRoot) {
+        res.writeHead(404, { 'Content-Type': 'text/html' });
+        res.end('404: File not found');
+        return;
+      }
+  
+      fsPromise.readFile(filePath)
+          .then(data => {
+              res.writeHead(200, { 'Content-Type': type });
+              res.end(data);
+          })
+          .catch(err => {
+              res.writeHead(404, { 'Content-Type': 'text/html' });
+              res.end('404: File not found');
+          });
+      }
   }
 
-const server = http.createServer(requestListner);
+var server = http.createServer(requestListner);
 
 server.listen(port, host, () => {
     console.log(`Server is running on http://${host}:${port}`);
