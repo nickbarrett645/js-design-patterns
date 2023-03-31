@@ -43,6 +43,7 @@ var requestListner = (req, res) => {
       fileName = 'index.html';
       extension = 'html';
       type = types[extension];
+    }
 
     if (!extension && queryData.proxy) {
         var request = https.get(queryData.proxy, function(response) {
