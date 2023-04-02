@@ -28,11 +28,12 @@ var requestListner = (req, res) => {
     console.log(`${req.method} ${req.url}`);
   
     var extension = path.extname(req.url).slice(1);
-    var type = extension ? types[extension] : types.xml;
+    var type = extension ? types[extension] : types.json;
     var supportedExtension = Boolean(type);
     var queryData = url.parse(req.url, true).query;
-  
+
     if (!supportedExtension) {
+      console.log('here1');
       res.writeHead(404, { 'Content-Type': 'text/html' });
       res.end('404: File not found');
       return;
@@ -65,7 +66,7 @@ var requestListner = (req, res) => {
           res.end('404: Failed to get feed');
         });
         
-    } else if(!extension && queryData.id) {
+    } else if(type === types.json && queryData.id) {
       res.writeHead(200, {'Content-Type': types.json});
       res.end(JSON.stringify({id: queryData.id, data: 'test data'}))
     } else {
@@ -86,6 +87,7 @@ var requestListner = (req, res) => {
               res.end(data);
           })
           .catch(err => {
+            console.log('here2');
               res.writeHead(404, { 'Content-Type': 'text/html' });
               res.end('404: File not found');
           });
