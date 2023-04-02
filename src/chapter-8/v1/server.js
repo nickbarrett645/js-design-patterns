@@ -33,7 +33,6 @@ var requestListner = (req, res) => {
     var queryData = url.parse(req.url, true).query;
 
     if (!supportedExtension) {
-      console.log('here1');
       res.writeHead(404, { 'Content-Type': 'text/html' });
       res.end('404: File not found');
       return;
@@ -87,7 +86,6 @@ var requestListner = (req, res) => {
               res.end(data);
           })
           .catch(err => {
-            console.log('here2');
               res.writeHead(404, { 'Content-Type': 'text/html' });
               res.end('404: File not found');
           });
