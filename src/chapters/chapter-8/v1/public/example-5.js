@@ -220,8 +220,7 @@ onload = function() {
         }
     }
 
-    var addRequest = function(request) {
-        var data = request.split('-')[1];
+    var addRequest = function(data) {
         q.add({
             method: 'GET',
             uri: 'blah?id=' + data,
@@ -230,6 +229,10 @@ onload = function() {
 
         requests.push(data);
         queue.innerHTML = requests.toString();
+    }
+
+    var addRequestClick = function(request) {
+        addRequest(request.split('-')[1]);
     }
 
     items.addEventListener('click', function(e) {
@@ -243,6 +246,6 @@ onload = function() {
         var e = e || window.event;
         var src = e.target;
         e.preventDefault();
-        addRequest(src.id);
+        addRequestClick(src.id);
     });
 }
